@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            margin: 10px;
+        }
+
+        article{
+            padding: 10%;
+        }
+
+        img{ 
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 50%;
+        }
+
+        button:hover {
+            cursor: pointer;
+        }
+
+        button{
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 50%;
+        }
+
+        h1{
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 50%;
+        }
+
+        p{
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            width: 50%;
+        }
+    </style>
+    <script>
+        fetch('http://localhost:3000/movies')
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('the api has failed')
+                }
+
+                return res.json()
+            })
+            .then(data => {
+                if (data.length <= 0) {
+                    const emptyPage = '<h1>Nothing to display</h1>'
+                    return document.querySelector('main').innerHTML = emptyPage
+                }
+
+                const html = data.map( movie => {
+                    return `
+                        <article data-id="${movie.id}">
+                            <img src="${movie.poster}" alt="${movie.tilte}">
+                            <h1>${movie.title}</h1>
+                            <p>${movie.year}</p>
+                            <button style="width: 300px; height: 50px; background-color: #FF5733; border-radius: 10px;">Eliminar</button>
+                        </article> 
+                    `
+                }).join('')
+
+                document.querySelector('main').innerHTML = html
+            })
+
+            document.addEventListener('click', (e) => {
+                if (e.target.matches('button')) {
+                    const article = e.target.closest('article')
+                    const id = article.dataset.id
+
+                    fetch(`http://localhost:3000/movies/${id}`, {
+                        method: 'DELETE'
+                    }).then(res => {
+                        if (res.ok) {
+                            return location.reload()
+                        }
+                    })
+                }
+            })
+    </script>
+</head>
+<body>
+    <main></main>
+</body>
+</html>
